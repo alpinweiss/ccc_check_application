@@ -184,3 +184,7 @@ buildNumber.properties
 
 # Exclude maven wrapper
 !/.mvn/wrapper/maven-wrapper.jar
+.idea/ccc_check_application.iml
+.idea/compiler.xml
+.idea/misc.xml
+.idea/modules.xml

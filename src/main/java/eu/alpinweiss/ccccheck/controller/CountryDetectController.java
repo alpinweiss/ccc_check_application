@@ -1,5 +1,7 @@
-package eu.alpinweiss.ccccheck.phonenumber;
+package eu.alpinweiss.ccccheck.controller;
 
+import eu.alpinweiss.ccccheck.service.PhoneNumberService;
+import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,15 +20,19 @@ public class CountryDetectController {
 	private PhoneNumberService phoneNumberService;
 
 	@RequestMapping(value = "/detect/country/by/number/{phoneNumber}", produces = "application/json")
-	public ResponseEntity<String> detectCountryByPhoneNumber(@PathVariable String phoneNumber) {
+	public ResponseEntity<JSONObject> detectCountryByPhoneNumber(@PathVariable String phoneNumber) {
+		JSONObject response = new JSONObject();
 		if (StringUtils.isEmpty(phoneNumber) || !phoneNumber.startsWith("+") && !phoneNumber.startsWith("00")) {
-			return ResponseEntity.badRequest().body(null);
+			return ResponseEntity.badRequest().body(response);
 		}
+
 		try {
 			Set<String> countrySet = phoneNumberService.getCountryName(phoneNumber.replaceAll(" ", ""));
-			return ResponseEntity.ok(String.join(" or ", countrySet));
+			response.put("country", String.join(" or ", countrySet));
+			return ResponseEntity.ok(response);
 		} catch (IOException ioe) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Can't fetch phone numbers from wiki!");
+			response.put("message", "Can't fetch phone numbers from wiki!");
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		}
 	}
 }

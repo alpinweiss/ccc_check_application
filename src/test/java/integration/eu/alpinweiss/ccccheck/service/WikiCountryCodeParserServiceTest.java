@@ -24,7 +24,7 @@ public class WikiCountryCodeParserServiceTest {
 	private WikiCountryCodeParserService service;
 
 	@Test
-	public void testParserByRealContent() throws IOException {
+	public void testRealDataByCountryPrefix() throws IOException {
 		Map<String, Set<String>> countryCodes = service.getCountryCodes();
 
 		Set<String> countryNames = countryCodes.get(LATVIA_PREFIX);

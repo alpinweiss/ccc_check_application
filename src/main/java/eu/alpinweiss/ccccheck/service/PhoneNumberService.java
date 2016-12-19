@@ -28,7 +28,7 @@ public class PhoneNumberService {
 		return countrySet;
 	}
 
-	public int getOffsetByNumber(String number) {
+	private int getOffsetByNumber(String number) {
 		int offset = 0;
 		if (number.startsWith("+")) {
 			offset = 1;

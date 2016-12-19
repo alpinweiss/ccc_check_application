@@ -4,6 +4,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -15,16 +16,31 @@ import java.util.Set;
 @Service
 public class WikiCountryCodeParserService {
 
-	private final static String COUNTRY_CALLING_CODES_LIST_URL = "https://en.wikipedia.org/wiki/List_of_country_calling_codes";
-
 	private final static String TABLE_CLASS = ".wikitable";
 	private final static Integer CODES_TABLE_NUMBER = 1;
 	private final static String TABLE_HEAD_COUNTRY_NAME = "Country, Territory or Service";
 	private final static String TABLE_HEAD_COUNTRY_CODE_NAME = "Code";
 
-	public Map<String, Set<String>> getCountryCodes() throws IOException {
-		Document document = getPageDocument();
+	@Value("${country.codes.wiki.url}")
+	private String wikiUrl;
 
+	@Value("${data.cache.time.milliseconds}")
+	private long dataCacheTimeInMilliseconds;
+
+	private Map<String, Set<String>> countryByPrefixMap = new HashMap<>();
+	private long lastFetchTime;
+
+	public Map<String, Set<String>> getCountryCodes() throws IOException {
+		if (countryByPrefixMap.isEmpty() || isTimeToRefresh()) {
+			Document document = getPageDocument();
+			countryByPrefixMap.putAll(parseWikiPage(document));
+			lastFetchTime = System.currentTimeMillis();
+		}
+
+		return countryByPrefixMap;
+	}
+
+	public Map<String, Set<String>> parseWikiPage(Document document) {
 		Elements tableRows = getTableRows(document);
 		int countryNamePosition = -1;
 		int codePosition = -1;
@@ -45,8 +61,12 @@ public class WikiCountryCodeParserService {
 		return parseAndSaveCountryCodes(tableRows, countryNamePosition, codePosition);
 	}
 
+	public boolean isTimeToRefresh() {
+		return lastFetchTime + dataCacheTimeInMilliseconds < System.currentTimeMillis();
+	}
+
 	private Document getPageDocument() throws IOException {
-		return Jsoup.connect(COUNTRY_CALLING_CODES_LIST_URL).get();
+		return Jsoup.connect(wikiUrl).get();
 	}
 
 	private Elements getTableRows(Document document) {

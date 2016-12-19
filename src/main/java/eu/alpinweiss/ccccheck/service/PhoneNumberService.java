@@ -2,32 +2,20 @@ package eu.alpinweiss.ccccheck.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class PhoneNumberService {
 
-	private final static long CACHE_TIME = TimeUnit.HOURS.toMillis(3);
-
 	@Autowired
 	private WikiCountryCodeParserService wikiCountryCodeParserService;
 
-	private Map<String, Set<String>> countryByPrefixMap = new HashMap<>();
-	private long lastFetchTime;
-
 	public Set<String> getCountryName(String number) throws IOException {
-		if (countryByPrefixMap.isEmpty() || isTimeToRefresh()) {
-			countryByPrefixMap.putAll(wikiCountryCodeParserService.getCountryCodes());
-			lastFetchTime = System.currentTimeMillis();
-		}
+		Map<String, Set<String>> countryByPrefixMap = wikiCountryCodeParserService.getCountryCodes();
 
-		Assert.notNull(number);
 		String prefix = "+";
 		int offset = getOffsetByNumber(number);
 		Set<String> countrySet = null;
@@ -48,9 +36,5 @@ public class PhoneNumberService {
 			offset = 2;
 		}
 		return offset;
-	}
-
-	private boolean isTimeToRefresh() {
-		return lastFetchTime + CACHE_TIME < System.currentTimeMillis();
 	}
 }

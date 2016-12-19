@@ -21,6 +21,7 @@ public class PhoneNumberServiceTest {
 
 	private final static String LATVIAN_PREFIX = "+371";
 	private final static String RUSSIAN_PREFIX = "+7";
+	private final static String RUSSIAN_PREFIX_00 = "007";
 	private final static String LONG_PREFIX = "99999999";
 
 	private final static int BIG_LIST_SIZE = 15000;
@@ -65,6 +66,19 @@ public class PhoneNumberServiceTest {
 	}
 
 	@Test
+	public void test00PrefixWithOneNumberInList() throws IOException {
+		Map<String, Set<String>> countryByPrefix = new HashMap<>();
+		countryByPrefix.put(RUSSIAN_PREFIX, new HashSet<>(Arrays.asList(RUSSIA_NAME)));
+
+		Mockito.when(wikiCountryCodeParserService.getCountryCodes()).thenReturn(countryByPrefix);
+
+		Set<String> countrySet = service.getCountryName(RUSSIAN_PREFIX_00);
+
+		Assert.assertEquals(1, countrySet.size());
+		Assert.assertTrue(countrySet.contains(RUSSIA_NAME));
+	}
+
+	@Test
 	public void testIncorrectLongPrefixWithOneNumberInList() throws IOException {
 		Map<String, Set<String>> countryByPrefix = new HashMap<>();
 		countryByPrefix.put(RUSSIAN_PREFIX, new HashSet<>(Arrays.asList(RUSSIA_NAME)));
@@ -78,7 +92,7 @@ public class PhoneNumberServiceTest {
 	}
 
 	@Test
-	public void testTwoCountrysByOnePrefix() throws IOException {
+	public void testTwoCountryByOnePrefix() throws IOException {
 		Map<String, Set<String>> countryByPrefix = new HashMap<>();
 		countryByPrefix.put(LATVIAN_PREFIX, new HashSet<>(Arrays.asList(RUSSIA_NAME, LATVIA_NAME)));
 

@@ -31,7 +31,7 @@ $(function(){
 						jInfoMessage.removeClass("alert-success");
 						jInfoMessage.addClass("alert-danger");
 					}
-					if (error.responseJSON) {
+					if (error.responseJSON && error.responseJSON.message) {
 						jInfoMessage.html(error.responseJSON.message);
 					} else {
 						switch (error.status) {

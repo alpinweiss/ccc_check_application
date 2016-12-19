@@ -35,7 +35,7 @@ public class CountryDetectControllerTest {
 	}
 
 	@Test
-	public void testEmptyNumber() {
+	public void testNumberIsNotProvided() {
 		ResponseEntity<JSONObject> response = countryDetectController.detectCountryByPhoneNumber("");
 
 		Assert.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());

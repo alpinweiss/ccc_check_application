@@ -5,6 +5,7 @@ $(function(){
 	var jPhoneNumber = $('#phoneNumber');
 	var jButton = $('#phoneSubmitButton');
 	var jInfoMessage = $('#infoMessage');
+	var jLoading = $('#loading');
 
 	jForm.submit(function(event) {
 		event.preventDefault();
@@ -14,6 +15,8 @@ $(function(){
 	jButton.click(function() {
 		var phoneNumber = jPhoneNumber.val();
 		jInfoMessage.hide();
+		jLoading.show();
+		jButton.attr('disabled', 'disabled');
 		if (phoneNumber.length > 0) {
 			$.ajax({
 				url: '/detect/country/by/number/' + phoneNumber,
@@ -25,6 +28,8 @@ $(function(){
 					}
 					jInfoMessage.html(data.country);
 					jInfoMessage.show();
+					jButton.removeAttr('disabled');
+					jLoading.hide();
 				},
 				error: function (error) {
 					if (jInfoMessage.hasClass("alert-success")) {
@@ -47,12 +52,14 @@ $(function(){
 								jInfoMessage.html("Unexpected error, please try again later!");
 						}
 					}
-					console.log(error);
 					jInfoMessage.show();
+					jButton.removeAttr('disabled');
+					jLoading.hide();
 				}
 			});
 		}
 	});
 
 	jInfoMessage.hide();
+	jLoading.hide();
 });
